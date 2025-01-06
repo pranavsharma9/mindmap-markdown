@@ -1,5 +1,5 @@
 import express from "express";
-import { renderMarkmap } from "./markmapRenderer.js";
+import { renderMarkmap, renderMarkmapWithPlayButton } from "./markmapRenderer.js";
 import AWS from "aws-sdk";
 import dotenv from "dotenv";
 import { writeFile } from "node:fs/promises";
@@ -25,8 +25,8 @@ async function uploadToS3(bucketName, key, imageBuffer) {
   return s3.upload(params).promise();
 }
 
-async function saveToFile(imageBuffer) {
-  const filePath = `./images/${Date.now()}.png`;
+async function saveToFile(imageBuffer, fileName) {
+  const filePath = `./images/${fileName}.png`;
   await writeFile(filePath, imageBuffer);
 }
 
@@ -41,6 +41,7 @@ app.post("/generate-markmap", async (req, res) => {
     }
 
     const imageBuffer = await renderMarkmap(markup);
+    const imageBufferWithPlayButton = await renderMarkmapWithPlayButton(markup);
 
     const s3BucketName = "mindmap-newsletter-bucket";
     const s3Key = `markmap-${Date.now()}.png`;
@@ -49,8 +50,20 @@ app.post("/generate-markmap", async (req, res) => {
       message: "Markmap image successfully uploaded to S3",
       imageUrl: uploadResult.Location,
     });
-    
-    // await saveToFile(imageBuffer);
+
+    const s3KeyWithPlayButton = `markmap-with-play-button-${Date.now()}.png`;
+    const uploadResultWithPlayButton = await uploadToS3(
+      s3BucketName,
+      s3KeyWithPlayButton,
+      imageBufferWithPlayButton
+    );
+    res.status(200).json({
+      message: "Markmap image with play button successfully uploaded to S3",
+      imageUrl: uploadResultWithPlayButton.Location,
+    });
+
+    // await saveToFile(imageBuffer, "markmap.png");
+    // await saveToFile(imageBufferWithPlayButton, "markmap-with-play-button.png");
     // res.status(200).json({
     //   message: "Markmap image successfully saved to file",
     // });

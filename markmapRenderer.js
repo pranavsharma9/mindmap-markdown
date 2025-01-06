@@ -4,7 +4,7 @@ import { fillTemplate } from "markmap-render";
 import nodeHtmlToImage from "node-html-to-image";
 import { writeFile } from "node:fs/promises";
 
-export async function renderMarkmap(markdown, outFile) {
+export async function renderMarkmapWithPlayButton(markdown, outFile) {
   const transformer = new Transformer();
   const { root, features } = transformer.transform(markdown);
   const assets = transformer.getUsedAssets(features);
@@ -69,6 +69,41 @@ export async function renderMarkmap(markdown, outFile) {
     /* Increased triangle size */
     border-width: 20px 0 20px 35px;
     border-color: transparent transparent transparent #fff;
+  }
+</style>
+`;
+
+  const imageBuffer = await nodeHtmlToImage({
+    html,
+    encoding: "buffer", // Return the image as a buffer
+  });
+
+  return imageBuffer;
+}
+
+export async function renderMarkmap(markdown, outFile) {
+  const transformer = new Transformer();
+  const { root, features } = transformer.transform(markdown);
+  const assets = transformer.getUsedAssets(features);
+
+  // This is the default HTML for the mindmap
+  let html = fillTemplate(root, assets, {
+    jsonOptions: {
+      duration: 0,
+      maxInitialScale: 5,
+      maxWidth: 500,
+    },
+  });
+
+  html += `
+<style>
+  /* Make sure the parent is relatively positioned for the overlay */
+  body, #mindmap {
+    position: relative;
+    width: 2400px;
+    height: 900px;
+    margin: 0;
+    padding: 0;
   }
 </style>
 `;
