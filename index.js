@@ -46,10 +46,6 @@ app.post("/generate-markmap", async (req, res) => {
     const s3BucketName = "mindmap-newsletter-bucket";
     const s3Key = `markmap-${Date.now()}.png`;
     const uploadResult = await uploadToS3(s3BucketName, s3Key, imageBuffer);
-    res.status(200).json({
-      message: "Markmap image successfully uploaded to S3",
-      imageUrl: uploadResult.Location,
-    });
 
     const s3KeyWithPlayButton = `markmap-with-play-button-${Date.now()}.png`;
     const uploadResultWithPlayButton = await uploadToS3(
@@ -59,7 +55,8 @@ app.post("/generate-markmap", async (req, res) => {
     );
     res.status(200).json({
       message: "Markmap image with play button successfully uploaded to S3",
-      imageUrl: uploadResultWithPlayButton.Location,
+      imageUrl: uploadResult.Location,
+      imageUrlWithPlayButton: uploadResultWithPlayButton.Location,
     });
 
     // await saveToFile(imageBuffer, "markmap.png");
