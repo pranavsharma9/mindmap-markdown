@@ -2,6 +2,7 @@ import express from "express";
 import { renderMarkmap } from "./markmapRenderer.js";
 import AWS from "aws-sdk";
 import dotenv from "dotenv";
+import { writeFile } from "node:fs/promises";
 
 dotenv.config();
 const s3 = new AWS.S3({
@@ -24,6 +25,11 @@ async function uploadToS3(bucketName, key, imageBuffer) {
   return s3.upload(params).promise();
 }
 
+async function saveToFile(imageBuffer) {
+  const filePath = `./images/${Date.now()}.png`;
+  await writeFile(filePath, imageBuffer);
+}
+
 app.use(express.json());
 
 app.post("/generate-markmap", async (req, res) => {
@@ -43,6 +49,11 @@ app.post("/generate-markmap", async (req, res) => {
       message: "Markmap image successfully uploaded to S3",
       imageUrl: uploadResult.Location,
     });
+    
+    // await saveToFile(imageBuffer);
+    // res.status(200).json({
+    //   message: "Markmap image successfully saved to file",
+    // });
   } catch (error) {
     console.error("Error generating Markmap:", error);
     res.status(500).json({
