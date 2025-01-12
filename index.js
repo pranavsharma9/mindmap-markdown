@@ -11,7 +11,7 @@ const s3 = new AWS.S3({
 });
 
 const app = express();
-const PORT = 3000;
+const PORT = 3001;
 
 async function uploadToS3(bucketName, key, imageBuffer) {
   const params = {
@@ -52,6 +52,6 @@ app.post("/generate-markmap", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0",() => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });
