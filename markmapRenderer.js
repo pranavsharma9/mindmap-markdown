@@ -14,6 +14,7 @@ export async function renderMarkmap(markdown, outFile) {
       jsonOptions: {
         duration: 0,
         maxInitialScale: 5,
+	maxWidth: 500
       },
     }) +
     `
@@ -21,7 +22,7 @@ export async function renderMarkmap(markdown, outFile) {
 body,
 #mindmap {
   width: 2400px;
-  height: 1800px;
+  height: 900px;
 }
 </style>
 `;
